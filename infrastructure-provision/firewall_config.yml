@@ -1,0 +1,69 @@
+---
+- name: Configure UFW Firewall for Ubuntu Homeserver
+  hosts: all
+  become: yes
+  become_user: root
+  become_method: sudo
+  tasks:
+    # Update and Upgrade APT packages
+      - name: Ensure all packages are updated
+        apt:
+          update_cache: yes
+          upgrade: 'safe'
+        
+      # Install some basic security tools
+      - name: Install ufw packages
+        apt:
+          name:
+            - ufw
+          state: present
+        notify: restart ufw
+
+      # Set up basic UFW rules
+      - name: Set UFW default rule to deny incoming
+        ufw:
+          direction: incoming
+          policy: deny
+
+      - name: Set UFW default rule to allow outgoing
+        ufw:
+          direction: outgoing
+          policy: allow
+
+      - name: Allow SSH with rate limiting
+        command: 
+          cmd: ufw limit OpenSSH
+
+      - name: Allow DNS TCP for Pi-hole
+        ufw:
+          rule: allow
+          port: '53'
+          proto: tcp
+
+      - name: Allow DNS UDP for Pi-hole
+        ufw:
+          rule: allow
+          port: '53'
+          proto: udp
+
+      - name: Allow HTTP for Pi-hole
+        ufw:
+          rule: allow
+          port: '80'
+          proto: tcp
+
+      - name: Allow HTTPS for Pi-hole
+        ufw:
+          rule: allow
+          port: '443'
+          proto: tcp
+
+      - name: Enable UFW
+        ufw:
+          state: enabled
+
+  handlers: 
+    - name: restart ufw
+      service:
+        name: ufw
+        state: restarted    

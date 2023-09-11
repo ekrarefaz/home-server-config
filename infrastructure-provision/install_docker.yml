@@ -1,0 +1,21 @@
+---
+- name: Install dependencies for Ubuntu Homeserver
+  hosts: all
+  become: yes
+  become_user: root 
+  become_method: sudo
+
+  tasks:
+    # Install Docker
+    - name: Install Docker
+      apt:
+        name: docker.io
+        state: present
+        update_cache: yes
+    
+    # Install Docker Compose
+    - name: Install Docker Compose
+      apt:
+        name: docker-compose
+        state: present
+        update_cache: yes

@@ -1,0 +1,23 @@
+---
+- name: Start Pi-hole docker service
+  hosts: all
+  become: yes
+  become_user: root
+  become_method: sudo
+  tasks:
+        
+    # Check Pi-hole docker container is running
+    - name: Check Pi-hole docker container status
+      docker_container_info:
+        name: pihole
+      register: pihole_container_info
+
+    - name: Assert Pi-hole docker container is running
+      assert:
+        that:
+          - pihole_container_info.container.State.Running
+        fail_msg: "Pi-hole docker container is not running!"
+        success_msg: "Pi-hole docker container is running."
+
+
+    
