@@ -1,0 +1,5 @@
+# Ignore Secret Variables 
+vars.yml
+
+# Ignore Inventory File
+inventory
