@@ -1,0 +1,39 @@
+---
+- name: Setup MySQL server using Docker
+  hosts: all
+  vars_files:
+    - ./variables/vars.yml
+  become: yes
+  become_user: root
+  become_method: sudo
+  tasks:
+    - name: Ensure Docker is installed
+      package:
+        name: docker
+        state: present
+
+    - name: Ensure Docker service is started
+      service:
+        name: docker
+        state: started
+
+    - name: Pull MySQL Docker image
+      docker_image:
+        name: mysql:latest
+        source: pull
+        state: present
+
+    - name: Run MySQL container
+      docker_container:
+        name: mysql_service
+        image: mysql:latest
+        state: started
+        restart_policy: always
+        env:
+          MYSQL_ROOT_PASSWORD: my-secret-pw
+          MYSQL_DATABASE: todoapp
+        exposed_ports:
+          - "3306"
+        ports:
+          - "3306:3306"
+
